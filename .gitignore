@@ -1,6 +1,7 @@
 node_modules/
+.task/
+frontend/bindings/
 dist/
-build/
 bin/
 *.exe
 *.msi

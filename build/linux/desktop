@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=OrionTV
+Comment=OrionTV desktop client for the Moreno Land live channel.
+# The Exec line includes %u to pass the URL to the application
+Exec=/usr/local/bin/oriontv %u
+Terminal=false
+Type=Application
+Icon=oriontv
+Categories=Utility;
+StartupWMClass=oriontv

@@ -1,0 +1,14 @@
+{
+  "name": "oriontv-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build:dev": "vite build --minify false --mode development",
+    "build": "vite build --mode production"
+  },
+  "devDependencies": {
+    "vite": "^8.0.5"
+  }
+}
