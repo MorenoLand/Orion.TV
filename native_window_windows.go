@@ -37,5 +37,10 @@ func handleNativeWindowMessage(window application.Window, message string) bool {
 		return false
 	}
 	w32.ReleaseCapture()
-	return w32.PostMessage(w32.HWND(uintptr(hwnd)), w32.WM_NCLBUTTONDOWN, hitTest, 0)
+	x, y, ok := w32.GetCursorPos()
+	if !ok {
+		return false
+	}
+	lParam := uintptr(uint16(int16(x))) | uintptr(uint16(int16(y)))<<16
+	return w32.PostMessage(w32.HWND(uintptr(hwnd)), w32.WM_NCLBUTTONDOWN, hitTest, lParam)
 }
