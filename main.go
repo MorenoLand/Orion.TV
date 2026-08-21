@@ -21,19 +21,48 @@ const dragRegionScript = `(function() {
     window.__oriontvDragInstalled = true;
     let pressed = false;
     let dragging = false;
+    let resizing = false;
     let suppressClick = false;
+    let resizeEdge = "";
     let startX = 0;
     let startY = 0;
+    function edgeAt(x, y) {
+        const width = document.documentElement.clientWidth;
+        const height = document.documentElement.clientHeight;
+        const left = x < 8;
+        const right = x >= width - 8 && x < width;
+        const top = y < 8;
+        const bottom = y >= height - 8 && y < height;
+        if (top && left) return "nw-resize";
+        if (top && right) return "ne-resize";
+        if (bottom && left) return "sw-resize";
+        if (bottom && right) return "se-resize";
+        if (left) return "w-resize";
+        if (right) return "e-resize";
+        if (top) return "n-resize";
+        if (bottom) return "s-resize";
+        return "";
+    }
     document.addEventListener("mousedown", function(event) {
         if (event.button !== 0) return;
         pressed = true;
         dragging = false;
+        resizing = false;
         suppressClick = false;
+        resizeEdge = edgeAt(event.clientX, event.clientY);
         startX = event.clientX;
         startY = event.clientY;
     }, true);
     document.addEventListener("mousemove", function(event) {
-        if (!pressed || dragging) return;
+        if (!pressed) return;
+        if (resizing || dragging) return;
+        if (resizeEdge) {
+            if (Math.hypot(event.clientX - startX, event.clientY - startY) < 1) return;
+            resizing = true;
+            suppressClick = true;
+            if (window.chrome && window.chrome.webview) window.chrome.webview.postMessage("wails:resize:" + resizeEdge);
+            return;
+        }
         if (Math.hypot(event.clientX - startX, event.clientY - startY) < 5) return;
         dragging = true;
         suppressClick = true;
@@ -43,6 +72,8 @@ const dragRegionScript = `(function() {
         if (event.button === 0) {
             pressed = false;
             dragging = false;
+            resizing = false;
+            resizeEdge = "";
         }
     }, true);
     document.addEventListener("click", function(event) {
@@ -55,6 +86,8 @@ const dragRegionScript = `(function() {
     window.addEventListener("blur", function() {
         pressed = false;
         dragging = false;
+        resizing = false;
+        resizeEdge = "";
     });
 })();`
 
