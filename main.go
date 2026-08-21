@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
+	"github.com/wailsapp/wails/v3/pkg/events"
 )
 
 //go:embed all:frontend/dist
@@ -14,6 +15,17 @@ var assets embed.FS
 var trayIcon []byte
 
 const liveURL = "https://orion.moreno.land/live.html"
+
+const dragRegionScript = `(function() {
+    const id = "oriontv-drag-region";
+    let style = document.getElementById(id);
+    if (!style) {
+        style = document.createElement("style");
+        style.id = id;
+        (document.head || document.documentElement).appendChild(style);
+    }
+    style.textContent = "html, body, body * { --wails-draggable: drag !important; }";
+})();`
 
 func main() {
 	app := application.New(application.Options{
@@ -32,8 +44,12 @@ func main() {
 		MinWidth:        640,
 		MinHeight:       480,
 		DisableResize:   false,
+		Frameless:       true,
 		InitialPosition: application.WindowCentered,
 		URL:             liveURL,
+	})
+	window.OnWindowEvent(events.Common.WindowRuntimeReady, func(_ *application.WindowEvent) {
+		window.ExecJS(dragRegionScript)
 	})
 
 	tray := app.SystemTray.New()

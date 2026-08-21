@@ -5,6 +5,7 @@ OrionTV is a Wails3 desktop client for the Moreno Land live channel. It loads `h
 ## Features
 
 - 1280×800 centered window with 640×480 minimum dimensions and resizing enabled.
+- Frameless window with full-surface primary-button dragging.
 - OrionTV application and tray icon using the supplied TV mark.
 - Tray menu actions for Show, Hide, and Quit.
 - Left-click tray toggle with focus restoration when showing the window.
