@@ -17,14 +17,45 @@ var trayIcon []byte
 const liveURL = "https://orion.moreno.land/live.html"
 
 const dragRegionScript = `(function() {
-    const id = "oriontv-drag-region";
-    let style = document.getElementById(id);
-    if (!style) {
-        style = document.createElement("style");
-        style.id = id;
-        (document.head || document.documentElement).appendChild(style);
-    }
-    style.textContent = "html, body, body * { --wails-draggable: drag !important; }";
+    if (window.__oriontvDragInstalled) return;
+    window.__oriontvDragInstalled = true;
+    let pressed = false;
+    let dragging = false;
+    let suppressClick = false;
+    let startX = 0;
+    let startY = 0;
+    document.addEventListener("mousedown", function(event) {
+        if (event.button !== 0) return;
+        pressed = true;
+        dragging = false;
+        suppressClick = false;
+        startX = event.clientX;
+        startY = event.clientY;
+    }, true);
+    document.addEventListener("mousemove", function(event) {
+        if (!pressed || dragging) return;
+        if (Math.hypot(event.clientX - startX, event.clientY - startY) < 5) return;
+        dragging = true;
+        suppressClick = true;
+        if (window.chrome && window.chrome.webview) window.chrome.webview.postMessage("wails:drag");
+    }, true);
+    document.addEventListener("mouseup", function(event) {
+        if (event.button === 0) {
+            pressed = false;
+            dragging = false;
+        }
+    }, true);
+    document.addEventListener("click", function(event) {
+        if (!suppressClick) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        suppressClick = false;
+    }, true);
+    document.addEventListener("dragstart", function(event) { event.preventDefault(); }, true);
+    window.addEventListener("blur", function() {
+        pressed = false;
+        dragging = false;
+    });
 })();`
 
 func main() {
@@ -48,7 +79,8 @@ func main() {
 		InitialPosition: application.WindowCentered,
 		URL:             liveURL,
 	})
-	window.OnWindowEvent(events.Common.WindowRuntimeReady, func(_ *application.WindowEvent) {
+	window.OnWindowEvent(events.Windows.WebViewNavigationCompleted, func(_ *application.WindowEvent) {
+		window.HandleMessage("wails:runtime:ready")
 		window.ExecJS(dragRegionScript)
 	})
 
