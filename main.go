@@ -85,7 +85,7 @@ const dragRegionScript = `(function() {
         if (Math.hypot(event.clientX - startX, event.clientY - startY) < 5) return;
         dragging = true;
         suppressClick = true;
-        if (window.chrome && window.chrome.webview) window.chrome.webview.postMessage("oriontv:drag");
+        if (window.chrome && window.chrome.webview) window.chrome.webview.postMessage("wails:drag");
     }, true);
     document.addEventListener("mouseup", function(event) {
         if (event.button === 0) {
@@ -117,8 +117,6 @@ func handleRawWindowMessage(window application.Window, message string, _ *applic
 		return
 	}
 	switch {
-	case message == "oriontv:drag":
-		window.HandleMessage("wails:drag")
 	case strings.HasPrefix(message, "oriontv:resize:"):
 		window.HandleMessage("wails:resize:" + strings.TrimPrefix(message, "oriontv:resize:"))
 	}

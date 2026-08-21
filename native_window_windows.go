@@ -23,8 +23,6 @@ var nativeResizeHitTests = map[string]uintptr{
 func handleNativeWindowMessage(window application.Window, message string) bool {
 	var hitTest uintptr
 	switch {
-	case message == "oriontv:drag":
-		hitTest = w32.HTCAPTION
 	case strings.HasPrefix(message, "oriontv:resize:"):
 		var ok bool
 		hitTest, ok = nativeResizeHitTests[strings.TrimPrefix(message, "oriontv:resize:")]
