@@ -1,0 +1,9 @@
+node_modules/
+dist/
+build/
+bin/
+*.exe
+*.msi
+*.msix
+*.zip
+coverage/
